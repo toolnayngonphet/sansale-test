@@ -6,6 +6,27 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// HÀM CỨU CÁNH: Đọc body an toàn trên môi trường Netlify Serverless
+const getSafeBody = (req) => {
+    // Nếu express.json() hoạt động bình thường
+    if (req.body && req.body.url) return req.body;
+    
+    // Nếu Netlify mã hóa body, chúng ta sẽ tự giải mã
+    if (req.apiGateway && req.apiGateway.event && req.apiGateway.event.body) {
+        try {
+            const event = req.apiGateway.event;
+            const rawBody = event.isBase64Encoded 
+                ? Buffer.from(event.body, 'base64').toString('utf-8') 
+                : event.body;
+            return JSON.parse(rawBody);
+        } catch (e) {
+            return {};
+        }
+    }
+    return {};
+};
 
 const MY_AFFILIATE_ID = "17344490003"; 
 const resolvedLinksCache = {};
@@ -42,7 +63,10 @@ router.get('/vouchers', async (req, res) => {
 
 router.post('/product-info', async (req, res) => {
     try {
-        const { url } = req.body;
+        // Sử dụng hàm an toàn để lấy data
+        const body = getSafeBody(req);
+        const url = body.url;
+        
         if (!url) {
             return res.status(400).json({ success: false, message: 'Thiếu URL sản phẩm' });
         }
@@ -56,7 +80,6 @@ router.post('/product-info', async (req, res) => {
             
             if (info && info.productLink) {
                 resolvedLinksCache[url.trim()] = info.productLink;
-                console.log(`🎯 Đã lưu cache link dài từ Addlivetag: ${info.productLink}`);
             }
             
             return res.json({
@@ -70,14 +93,16 @@ router.post('/product-info', async (req, res) => {
         
         return res.json({ success: false, message: "Không lấy được chi tiết sản phẩm" });
     } catch (error) {
-        console.log("⚠️ Lỗi fetch dữ liệu thông tin sản phẩm:", error.message);
         return res.json({ success: false, message: error.message });
     }
 });
 
 router.post('/split-link', async (req, res) => {
     try {
-        const { url } = req.body;
+        // Sử dụng hàm an toàn để lấy data
+        const body = getSafeBody(req);
+        const url = body.url;
+        
         if (!url) {
             return res.status(400).json({ success: false, message: 'Vui lòng cung cấp link Shopee' });
         }
@@ -118,8 +143,6 @@ router.post('/split-link', async (req, res) => {
                 });
             }
         } catch (apiErr) {
-            console.log('⚠️ Không lấy được voucher từ Salesoc:', apiErr.message);
-            
             return res.json({
                 success: false,
                 message: "Tạm hết mã giảm giá hoặc website đang quá tải, vui lòng thử lại sau 5s"
@@ -127,7 +150,6 @@ router.post('/split-link', async (req, res) => {
         }
 
     } catch (error) {
-        console.error("❌ Lỗi Core Hệ Thống:", error);
         return res.json({ 
             success: false, 
             message: "Tạm hết mã giảm giá hoặc website đang quá tải, vui lòng thử lại sau 5s"
@@ -135,6 +157,7 @@ router.post('/split-link', async (req, res) => {
     }
 });
 
-app.use('/api', router);
+// Gắn router vào cả 2 dạng đường dẫn để bắt mọi cấu hình của Netlify
+app.use(['/api', '/.netlify/functions/api'], router);
 
 module.exports.handler = serverless(app);
