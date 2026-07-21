@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống tự động ép Voucher 22% Shopee</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 650px;
+            margin: 40px auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h2 {
+            color: #ee4d2d;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+        .voucher-badge {
+            background-color: #fff5f5;
+            border: 1px dashed #ee4d2d;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #ee4d2d;
+        }
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            border-color: #ee4d2d;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #ee4d2d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #d73a1e;
+        }
+        #loading {
+            display: none;
+            text-align: center;
+            font-weight: bold;
+            color: #666;
+            margin: 15px 0;
+        }
+        #result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 5px solid #ee4d2d;
+            display: none;
+            border-radius: 4px;
+        }
+        .product-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #222;
+            margin-top: 0;
+        }
+        .info-row {
+            margin: 8px 0;
+            font-size: 15px;
+        }
+        .price { color: #ee4d2d; font-weight: bold; }
+        .com { color: #2b9348; font-weight: bold; }
+        .link-section {
+            margin-top: 15px;
+            background: #fff;
+            padding: 12px;
+            border: 1px dashed #ee4d2d;
+            border-radius: 4px;
+            word-break: break-all;
+        }
+        .link-section a {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .link-section a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Hệ thống nhúng tự động Voucher 22%</h2>
+    
+    <div class="voucher-badge">
+        🔥 Đang cấu hình ép mã: METAPAR1JULD22300 (Giảm 22%)
+    </div>
+    
+    <label for="originUrl">Dán link sản phẩm Shopee của khách vào đây:</label>
+    <input type="text" id="originUrl" placeholder="Ví dụ: https://s.shopee.vn/7VEloQQ86Z hoặc link ngắn, link dài...">
+    
+    <button onclick="convertShopeeLink()">Tạo Link Tự Động Áp Mã</button>
+
+    <div id="loading">Đang kết nối API trung gian để bóc tách dữ liệu...</div>
+
+    <div id="result">
+        <p class="product-title" id="pName"></p>
+        
+        <div class="info-row">Giá gốc trên Shopee: <span id="pPrice" class="price"></span> VNĐ</div>
+        <div class="info-row">Hoa hồng bạn nhận được: <span id="pCom" class="com"></span> VNĐ</div>
+        
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+        
+        <label>Link Affiliate đã nhúng mã voucher của riêng bạn:</label>
+        <div class="link-section">
+            <a id="pLink" href="#" target="_blank"></a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ID Affiliate cá nhân của bạn
+    const MY_AFFILIATE_ID = "17344490003"; 
+    
+    // Mã voucher cần ép cứng vào URL
+    const FIXED_VOUCHER_CODE = "METAPAR1JULD22300";
+
+    // API trung gian lấy thông tin sản phẩm từ addlivetag
+    const API_ENDPOINT = "https://data.addlivetag.com/product-data/product-data.php";
+
+    async function convertShopeeLink() {
+        const originUrl = document.getElementById('originUrl').value.trim();
+        const loadingDiv = document.getElementById('loading');
+        const resultDiv = document.getElementById('result');
+        
+        if(!originUrl) {
+            alert('Vui lòng dán link Shopee vào ô nhập liệu!');
+            return;
+        }
+
+        loadingDiv.style.display = 'block';
+        resultDiv.style.display = 'none';
+
+        try {
+            // Gọi API trung gian để lấy dữ liệu thống kê sản phẩm
+            const targetApi = `${API_ENDPOINT}?url=${encodeURIComponent(originUrl)}`;
+            const response = await fetch(targetApi);
+            const data = await response.json();
+
+            loadingDiv.style.display = 'none';
+
+            if(data.status === "success" && data.productInfo) {
+                const info = data.productInfo;
+                
+                document.getElementById('pName').innerText = info.productName;
+                document.getElementById('pPrice').innerText = Number(info.price).toLocaleString('vi-VN');
+                document.getElementById('pCom').innerText = Number(info.commission).toLocaleString('vi-VN');
+                
+                // THUẬT TOÁN ĐÍNH VOUCHER: 
+                // 1. Thêm tham số ?voucher_code= vào sau link gốc của khách hàng
+                // Kiểm tra xem link gốc đã có dấu hỏi chấm (?) chưa để nối chuỗi cho đúng format URL
+                const separator = originUrl.includes('?') ? '&' : '?';
+                const originLinkWithVoucher = `${originUrl}${separator}voucher_code=${FIXED_VOUCHER_CODE}`;
+                
+                // 2. Bọc toàn bộ link đã có voucher đó vào cổng chuyển hướng an_redir cùng ID của bạn
+                const finalAffiliateUrl = `https://s.shopee.vn/an_redir?origin_link=${encodeURIComponent(originLinkWithVoucher)}&affiliate_id=${MY_AFFILIATE_ID}&sub_id=salesoc_local_html`;
+                
+                const linkElement = document.getElementById('pLink');
+                linkElement.href = finalAffiliateUrl;
+                linkElement.innerText = finalAffiliateUrl;
+                
+                resultDiv.style.display = 'block';
+            } else {
+                alert('API không nhận diện được link này hoặc sản phẩm không được hỗ trợ hoa hồng.');
+            }
+        } catch (error) {
+            loadingDiv.style.display = 'none';
+            alert('Lỗi kết nối mạng: ' + error.message);
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "sansale-shopee",
+  "version": "1.0.0",
+  "description": "He thong phan luong san sale Shopee",
+  "scripts": {},
+  "dependencies": {
+    "axios": "^1.18.1",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "serverless-http": "^3.2.0"
+  }
+}

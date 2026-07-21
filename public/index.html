@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lấy voucher 22% áp dụng cho mọi sản phẩm</title>
+    <style>
+        /* TOÀN BỘ HỆ MÀU SÁNG (LIGHT-MODE) CAO CẤP */
+        :root {
+            --primary: #ee4d2d;
+            --primary-hover: #d73a1e;
+            --bg-light: #f4f6f9;
+            --panel-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --input-bg: #f8fafc;
+        }
+
+        body { 
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif; 
+            max-width: 550px; 
+            margin: 0 auto; 
+            padding: 0 12px 40px 12px; 
+            background-color: var(--bg-light); 
+            color: var(--text-main); 
+        }
+
+        /* Facebook In-App Browser Notice Banner */
+        .fb-browser-notice {
+            display: flex; align-items: center; gap: 10px; background: #fee2e2; 
+            border: 1px solid #fca5a5; padding: 12px; border-radius: 10px; margin-top: 15px; margin-bottom: 15px;
+        }
+        .fb-browser-notice.hidden { display: none; }
+        .fb-notice-icon { color: var(--primary); display: flex; align-items: center; }
+        .fb-notice-text { flex: 1; font-size: 13px; color: #991b1b; }
+        .fb-notice-text p { margin: 3px 0 0 0; color: #b91c1c; }
+        .fb-notice-close { background: transparent; border: none; color: #991b1b; font-size: 20px; cursor: pointer; }
+
+        /* Khối Hero Banner */
+        .hero-banner { 
+            position: relative; text-align: center; padding: 40px 15px 25px 15px; 
+            background: linear-gradient(180deg, rgba(238,77,45,0.08) 0%, rgba(244,246,249,0) 100%);
+            border-radius: 0 0 20px 20px; overflow: hidden;
+        }
+        .hero-glow {
+            position: absolute; top: -50px; left: 50%; transform: translateX(-50%);
+            width: 200px; height: 100px; background: rgba(238,77,45,0.15); filter: blur(50px); pointer-events: none;
+        }
+        .hero-badge {
+            display: inline-block; background: rgba(238,77,45,0.1); color: var(--primary);
+            font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 20px;
+            border: 1px solid rgba(238,77,45,0.25); margin-bottom: 12px; letter-spacing: 0.5px;
+        }
+        .hero-title { font-size: 26px; font-weight: 800; line-height: 1.3; margin: 0 0 8px 0; letter-spacing: -0.5px; color: #0f172a; }
+        .hero-highlight { color: var(--primary); }
+        .hero-sub { font-size: 13px; color: var(--text-sub); margin: 0 0 20px 0; }
+
+        /* Khối Thống Kê Số Liệu */
+        .hero-stats { display: flex; justify-content: center; align-items: center; gap: 15px; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+        .stat-num { font-size: 18px; font-weight: 700; color: #0f172a; }
+        .stat-label { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+        .stat-divider { width: 1px; height: 20px; background: #cbd5e1; }
+
+        /* Cảnh Báo Flash Sale */
+        .urgency-banner {
+            display: flex; align-items: center; gap: 8px; background: rgba(238,77,45,0.06);
+            border: 1px solid rgba(238,77,45,0.12); padding: 10px 14px; border-radius: 10px;
+            font-size: 12.5px; margin-bottom: 20px; line-height: 1.4; color: #334155;
+        }
+        .urgency-banner svg { color: var(--primary); flex-shrink: 0; }
+
+        /* Khung Bao Panel */
+        .panel { background: var(--panel-bg); padding: 22px; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.04); }
+        .panel-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .panel-icon { color: var(--primary); display: flex; align-items: center; }
+        .panel-title { font-size: 16px; font-weight: 700; margin: 0; color: #0f172a; }
+
+        /* Form Nhập Liệu */
+        .input-group { position: relative; display: flex; align-items: center; width: 100%; margin: 10px 0 14px 0; }
+        input {
+            width: 100%; padding: 14px 75px 14px 14px; box-sizing: border-box; background: var(--input-bg);
+            border: 1px solid #cbd5e1; border-radius: 10px; color: #0f172a; font-size: 14.5px; transition: 0.2s;
+        }
+        input::placeholder { color: #94a3b8; }
+        input:focus { border-color: var(--primary); background: #fff; outline: none; box-shadow: 0 0 0 3px rgba(238, 77, 45, 0.1); }
+        
+        .btn-paste {
+            position: absolute; right: 12px; background-color: #e2e8f0; color: #475569; border: none; 
+            padding: 6px 12px; border-radius: 6px; font-size: 12.5px; font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .btn-paste:hover { background-color: #cbd5e1; color: #0f172a; }
+
+        /* Nút Tạo Link */
+        .btn-submit { 
+            width: 100%; padding: 14px; box-sizing: border-box; border-radius: 10px; font-size: 15px; 
+            background-color: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; 
+            transition: 0.2s; display: flex; justify-content: center; align-items: center; letter-spacing: 0.5px; 
+            box-shadow: 0 2px 4px rgba(238, 77, 45, 0.2);
+        }
+        .btn-submit:hover { background-color: var(--primary-hover); }
+        .btn-submit:disabled { background-color: #e2e8f0 !important; color: #94a3b8; cursor: not-allowed; animation: blink 1.5s infinite ease-in-out; box-shadow: none; }
+        
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* Card Thông Tin Sản Phẩm */
+        .product-card { display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin: 15px 0; }
+        .prod-title { font-weight: bold; font-size: 14px; color: #1e293b; line-height: 1.4; margin-bottom: 8px; }
+        .prod-meta-wrapper { display: flex; gap: 15px; font-size: 12.5px; color: var(--text-sub); align-items: center; }
+        .prod-price-text { color: var(--primary); font-weight: 700; font-size: 16px; }
+
+        /* Kết Quả Phân Luồng */
+        .convert-result { display: none; }
+        .section-headline { font-size: 12.5px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 20px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .section-headline::after { content: ''; flex: 1; height: 1px; background: #e2e8f0; }
+        
+        .step1-nodes-container { display: flex; flex-direction: row; gap: 10px; margin-top: 10px; width: 100%; justify-content: space-between; }
+        .voucher-node-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; text-align: left; flex: 1; min-width: 0; }
+        
+        .btn-go { display: inline-block; padding: 12px; color: white; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box; text-align: center; display: flex; justify-content: center; align-items: center; gap: 6px; }
+        .btn-fb { background: linear-gradient(135deg, #1877f2, #0d62d6); }
+        .btn-ytb { background: linear-gradient(135deg, #ff0000, #cc0000); }
+        
+        /* Cụm Nút Mở App Bước 2 */
+        .v3-action-wrapper { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+        .btn-2 { background-color: var(--primary); width: 100%; padding: 13px 10px; font-size: 14.5px; box-shadow: 0 2px 4px rgba(238, 77, 45, 0.2); text-align: center; color: #fff; text-decoration: none; font-weight: bold; border-radius: 8px; display: block; box-sizing: border-box; }
+        .btn-2:hover { background-color: var(--primary-hover); }
+        .step-badge-mini { font-size: 10px; font-weight: 800; background: rgba(255,255,255,0.25); border-radius: 50%; width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px; flex-shrink: 0; color: #fff; }
+        .v3-hint { font-size: 12.5px; color: #b45309; line-height: 1.4; padding: 8px 10px; background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; text-align: center; }
+
+        /* Tabs Điều Hướng Sáng */
+        .tab-wrapper { display: flex; background: #e2e8f0; padding: 4px; border-radius: 10px; margin-bottom: 25px; }
+        .tab-btn { flex: 1; padding: 10px; text-align: center; border-radius: 7px; font-weight: bold; cursor: pointer; font-size: 13.5px; border: none; background: transparent; color: #475569; transition: 0.2s; }
+        .tab-btn.active { background: #ffffff; color: var(--primary); font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+
+        #tab-single-view, #tab-history-view { display: none; }
+        #tab-single-view.active, #tab-history-view.active { display: block; }
+
+        .history-header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 13px; font-weight: bold; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-clear-all { color: #ef4444; cursor: pointer; background: transparent; border: none; font-weight: bold; }
+        
+        /* Khối Lịch Sử Sáng */
+        .hist-item-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        .hist-prod-info { display: flex; gap: 10px; align-items: center; min-width: 0; flex: 1; }
+        .hist-img-placeholder { width: 42px; height: 42px; border-radius: 6px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 1px solid #cbd5e1; flex-shrink: 0; }
+        .hist-title-txt { font-size: 13.5px; font-weight: bold; line-height: 1.4; color: #1e293b; margin-bottom: 2px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        .hist-url-txt { font-size: 12px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .hist-time-txt { font-size: 10.5px; color: #94a3b8; margin-top: 1px; }
+        
+        .btn-history-go { background: var(--primary); color: #fff; border: none; padding: 10px 16px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none; text-align: center; flex-shrink: 0; transition: 0.2s; }
+        .btn-history-go:hover { background: var(--primary-hover); }
+
+        /* SỬA LỖI HIỂN THỊ ICON CỦA KHỐI TRUST-ROW */
+        .trust-row { display: flex; justify-content: center; gap: 15px; margin-top: 15px; margin-bottom: 25px; font-size: 12px; color: #64748b; }
+        .trust-badge { display: flex; align-items: center; gap: 4px; }
+        .trust-badge svg { color: #64748b; flex-shrink: 0; }
+        
+        .guide-steps { padding-left: 20px; font-size: 13.5px; line-height: 1.6; color: #334155; margin-bottom: 0; }
+        .guide-steps li { margin-bottom: 8px; }
+        
+        /* Card Live Voucher Sáng */
+        .dynamic-voucher-card { border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; margin-bottom: 15px; background: #ffffff; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .foot { text-align: center; font-size: 12px; color: #64748b; margin-top: 30px; }
+    </style>
+</head>
+<body>
+
+    <!-- BANNER TRÌNH DUYỆT FB -->
+    <div id="fb-browser-notice" class="fb-browser-notice hidden">
+        <div class="fb-notice-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="fb-notice-text">
+            <strong>Đang mở trong trình duyệt Facebook</strong>
+            <p>Vui lòng bấm dấu <strong>...</strong> ở góc trên bên phải &rarr; chọn <strong>Mở trong trình duyệt hệ thống</strong> để tránh bị lỗi liên kết.</p>
+        </div>
+        <div class="fb-notice-close" onclick="document.getElementById('fb-browser-notice').classList.add('hidden')">&times;</div>
+    </div>
+
+    <!-- KHỐI HERO BANNER -->
+    <div class="hero-banner">
+        <div class="hero-glow"></div>
+        <div class="hero-badge">FLASH SALE</div>
+        <h1 class="hero-title">Nhận Mã Giảm Giá<br/><span class="hero-highlight">Siêu Dễ Dàng</span></h1>
+        <p class="hero-sub">Dán link Shopee → Tạo link → Nhận mã giảm giá ngay</p>
+        <div class="hero-stats">
+            <div class="stat-item"><span class="stat-num">50K+</span><span class="stat-label">Người dùng</span></div>
+            <div class="stat-divider"></div>
+            <div class="stat-item"><span class="stat-num">2M+</span><span class="stat-label">Link đã tạo</span></div>
+            <div class="stat-divider"></div>
+            <div class="stat-item"><span class="stat-num">100%</span><span class="stat-label">Miễn phí</span></div>
+        </div>
+    </div>
+
+    <!-- THANH CẢNH BÁO FLASH SALE -->
+    <div class="urgency-banner">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span><strong>Lưu ý:</strong> Nếu voucher hết lượt, hãy canh các khung giờ 0h, 9h, 12h, 15h, 18h, 21h để mua.</span>
+    </div>
+
+    <!-- TABS CHUYỂN ĐỔI -->
+    <div class="tab-wrapper">
+        <button class="tab-btn active" id="tab-single" onclick="switchTab('single')">Tạo Link Nhận Mã</button>
+        <button class="tab-btn" id="tab-history" onclick="switchTab('history')">Lịch Sử Tạo Link</button>
+    </div>
+
+    <!-- TAB 1: TRÌNH TẠO LINK CHÍNH -->
+    <div id="tab-single-view" class="active">
+        <section class="panel">
+            <div class="panel-header">
+                <div class="panel-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                </div>
+                <p class="panel-title">Tạo Link Nhận Mã</p>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="shopeeUrl" placeholder="Dán link sản phẩm Shopee vào đây..." oninput="triggerAutoRun()">
+                <div class="btn-paste" onclick="pasteFromClipboard()">Dán</div>
+            </div>
+            
+            <button id="btnManualSubmit" class="btn-submit" onclick="generateWorkflow(true)">
+                <span id="btnText">TẠO LINK NGAY</span>
+            </button>
+
+            <!-- THÔNG TIN SẢN PHẨM SĂN SALE -->
+            <div id="productInfoCard" class="product-card">
+                <div id="cardTitle" class="prod-title">Đang nạp tên mặt hàng...</div>
+                <div class="prod-meta-wrapper">
+                    <span>Giá bán: <span id="cardPrice" class="prod-price-text">0đ</span></span>
+                    <span>Đã bán: <span id="cardSales" style="font-weight: bold; color: #0f172a;">0</span></span>
+                    <span>Đánh giá: <span id="cardRating" style="color: #ffc107; font-weight: bold;">0★</span></span>
+                </div>
+            </div>
+
+            <!-- KHỐI CHỨA HIỂN THỊ KẾT QUẢ ĐỘNG (BƯỚC 1 & BƯỚC 2) -->
+            <div id="workflow" class="convert-result">
+                <div class="section-headline">Bước 1: Ấn để lưu mã để vào Shopee (Tuyệt đối không mua hàng)</div>
+                <div class="step1-nodes-container" id="step1ButtonsZone"></div>
+
+                <div class="section-headline">Bước 2: Ấn để mua và áp mã hợp lệ</div>
+                <div id="boxStep2" class="v3-action-wrapper">
+                    <div class="v3-btn-row">
+                        <a id="btnStep2" class="btn-2" href="#" target="_blank">Mua hàng</a>
+                    </div>
+                    <div class="v3-hint">
+                        <strong>Bấm <em>B1 &rarr; Lưu voucher</em> trước &rarr; chờ 3s &rarr; quay lại bấm <em>B2 &rarr; Mua hàng</em> để nhận mã rẻ hơn</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- TAB VIEW 2: LỊCH SỬ THIẾT BỊ -->
+    <div id="tab-history-view">
+        <section class="panel">
+            <div class="history-header-bar">
+                <span>Lịch sử chuyển đổi</span>
+                <div class="btn-clear-all" onclick="clearAllHistory()">Xóa tất cả</div>
+            </div>
+            <div id="historyContainerTarget"></div>
+        </section>
+    </div>
+
+    <!-- BAO CHỨNG ĐỘ TIN CẬY (ĐÃ KHẮC PHỤC HOÀN TOÀN ICONS SVG LỖI HIỂN THỊ) -->
+    <div class="trust-row">
+        <div class="trust-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>Bảo mật 100%</span>
+        </div>
+        <div class="trust-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Nhanh chóng</span>
+        </div>
+        <div class="trust-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <span>Miễn phí</span>
+        </div>
+    </div>
+
+    <!-- KHỐI HƯỚNG DẪN MẪU SHORT.SHPEE -->
+    <section class="panel">
+        <div class="panel-header">
+            <div class="panel-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            </div>
+            <div class="panel-title">Hướng dẫn</div>
+        </div>
+        <ol class="guide-steps">
+            <li>B1: Sau khi tạo link, nhấn <strong>Lưu voucher</strong> sẽ chuyển sang app Shopee.</li>
+            <li>B2: Chờ 3s &rarr; quay lại bấm <strong>Mua hàng</strong> để nhận mã rẻ hơn</li>
+            <li>Lưu ý: Làm đủ 2 bước để nhận mã, nếu không sẽ không nhận được mã.</li>
+        </ol>
+    </section>
+
+    <!-- LIVE VOUCHERS DỮ LIỆU ĐỘNG -->
+    <section class="panel">
+        <h3 style="margin: 0 0 15px 0; font-size: 15px; color: #1e293b; border-left: 4px solid #ee4d2d; padding-left: 8px;">Mã giảm giá</h3>
+        <div id="voucher-container">
+            <p style="font-size: 13px; color: var(--text-sub); text-align: center; padding: 10px;">Đang tải danh sách dữ liệu mã giảm giá...</p>
+        </div>
+    </section>
+
+    <footer class="foot">&copy; 2026 — Developed by vdg</footer>
+
+<script>
+    let delayTimer;
+    let liveVouchersCache = [];
+    const typingDelay = 400; 
+
+    function switchTab(tabName) {
+        document.getElementById('tab-single').classList.remove('active');
+        document.getElementById('tab-history').classList.remove('active');
+        document.getElementById('tab-single-view').classList.remove('active');
+        document.getElementById('tab-history-view').classList.remove('active');
+
+        if(tabName === 'single') {
+            document.getElementById('tab-single').classList.add('active');
+            document.getElementById('tab-single-view').classList.add('active');
+        } else {
+            document.getElementById('tab-history').classList.add('active');
+            document.getElementById('tab-history-view').classList.add('active');
+            renderHistoryList(); 
+        }
+    }
+
+    async function fetchLiveVouchers() {
+        try {
+            const res = await fetch('/api/vouchers');
+            const data = await res.json();
+            if (data.success && data.vouchers) {
+                liveVouchersCache = data.vouchers; 
+                renderLiveVouchers(data.vouchers);
+            } else {
+                document.getElementById('voucher-container').innerHTML = `<p style="font-size:13px; color:#d9381e; text-align:center;">${data.message || 'Không thể đồng bộ danh sách mã.'}</p>`;
+            }
+        } catch (err) {
+            console.error("Lỗi nạp API voucher:", err);
+            document.getElementById('voucher-container').innerHTML = '<p style="font-size:13px; color:#d9381e; text-align:center;">Lỗi kết nối máy chủ dữ liệu mã.</p>';
+        }
+    }
+
+    function renderLiveVouchers(vouchers) {
+        const container = document.getElementById('voucher-container');
+        container.innerHTML = ''; 
+
+        vouchers.forEach((v, index) => {
+            const isExpired = v.status === 'expired' || v.fully_used === 1 || v.usage_progress >= 100;
+            const statusText = isExpired ? 'Hết lượt' : 'Còn lượt';
+            const progressColor = isExpired ? '#ff4514' : '#00aa5b';
+            const progressBg = isExpired ? '#fee2e2' : '#e8f5e9';
+
+            const html = `
+                <div class="dynamic-voucher-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:11px; color:#64748b; font-weight:bold; letter-spacing:0.5px;">MÃ VOUCHER</span>
+                        <span style="background:${progressBg}; color:${progressColor}; padding:2px 10px; border-radius:4px; font-size:12px; font-weight:bold;">${statusText}</span>
+                    </div>
+                    <h3 style="margin:8px 0 4px 0; font-size:22px; font-family:monospace; color:#0f172a; font-weight:bold;">${v.voucher_code}</h3>
+                    <p style="margin:0 0 12px 0; font-size:13.5px; color:#334155; background:#f8fafc; padding:8px 12px; border-radius:4px; border-left:3px solid ${progressColor}; border: 1px solid #e2e8f0;">${v.description}</p>
+                    <div style="display:flex; justify-content:space-between; font-size:12.5px; color:#64748b; margin-bottom:6px;">
+                        <span>Tỷ lệ đã sử dụng</span>
+                        <span style="color:${progressColor}; font-weight:bold;">${v.usage_progress}%</span>
+                    </div>
+                    <div style="width:100%; background:#e2e8f0; height:8px; border-radius:4px; overflow:hidden;">
+                        <div style="width:${v.usage_progress}%; background:${progressColor}; height:100%; border-radius:4px;"></div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        });
+    }
+
+    async function pasteFromClipboard() {
+        try {
+            const text = await navigator.clipboard.readText();
+            if (text) {
+                const inputElement = document.getElementById('shopeeUrl');
+                inputElement.value = text.trim();
+                triggerAutoRun(); 
+            }
+        } catch (err) {
+            alert('Trình duyệt chặn quyền hoặc không hỗ trợ dán nhanh. Bạn vui lòng đè nhấn đúp vào ô nhập để dán thủ công nhé.');
+        }
+    }
+
+    function triggerAutoRun() {
+        clearTimeout(delayTimer);
+        const url = document.getElementById('shopeeUrl').value.trim();
+        if (url && (url.includes('shopee.vn') || url.includes('shp.ee'))) {
+            delayTimer = setTimeout(() => generateWorkflow(false), typingDelay);
+        }
+    }
+
+    async function generateWorkflow(isManual = false) {
+        const url = document.getElementById('shopeeUrl').value.trim();
+        if(!url) { if (isManual) alert('Vui lòng dán link Shopee vào!'); return; }
+
+        const btnManualSubmit = document.getElementById('btnManualSubmit');
+        const btnText = document.getElementById('btnText');
+        const productCard = document.getElementById('productInfoCard');
+        const workflow = document.getElementById('workflow');
+        
+        btnText.innerText = 'ĐANG XỬ LÝ...';
+        btnManualSubmit.disabled = true;
+        productCard.style.display = 'none';
+        workflow.style.display = 'none';
+
+        try {
+            const [infoResponse, splitResponse] = await Promise.all([
+                fetch('/api/product-info', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
+                }).then(res => res.json()).catch(() => null),
+
+                fetch('/api/split-link', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
+                }).then(res => res.json())
+            ]);
+
+            let pName = "Sản phẩm Shopee";
+            if (infoResponse && infoResponse.success) {
+                pName = infoResponse.productName;
+                document.getElementById('cardTitle').innerText = pName;
+                document.getElementById('cardPrice').innerText = Number(infoResponse.price).toLocaleString('vi-VN') + 'đ';
+                document.getElementById('cardSales').innerText = infoResponse.sales;
+                document.getElementById('cardRating').innerText = infoResponse.rating + '★';
+                productCard.style.display = 'block';
+            }
+
+            if (splitResponse && splitResponse.success) {
+                document.getElementById('btnStep2').href = splitResponse.step2;
+                buildStep1DynamicButtons(splitResponse);
+                workflow.style.display = 'block';
+                saveToHistoryLocalStorage(url, pName, splitResponse);
+            } else {
+                alert(splitResponse.message || 'Xử lý phân định tuyến liên kết thất bại từ máy chủ.');
+            }
+        } catch (err) {
+            console.error(err); alert('Lỗi kết nối Server: ' + err.message);
+        } finally {
+            btnText.innerText = 'TẠO LINK NGAY'; btnManualSubmit.disabled = false;
+        }
+    }
+
+    function buildStep1DynamicButtons(linksData) {
+        const zone = document.getElementById('step1ButtonsZone');
+        zone.innerHTML = '';
+
+        const platformsConfig = [];
+        
+        if (linksData.fbLink && linksData.fbLink.trim() !== "") {
+            platformsConfig.push({
+                key: 'fbLink', label: 'FB', btnClass: 'btn-fb', link: linksData.fbLink,
+                filter: (v) => v.voucher_code.toUpperCase().includes('META') || v.voucher_code.toUpperCase().includes('PAR')
+            });
+        }
+
+        if (linksData.ytbLink && linksData.ytbLink.trim() !== "") {
+            platformsConfig.push({
+                key: 'ytbLink', label: 'YTB', btnClass: 'btn-ytb', link: linksData.ytbLink,
+                filter: (v) => v.voucher_code.toUpperCase().includes('YOUTUBE') || v.voucher_code.toUpperCase().includes('YT')
+            });
+        }
+
+        platformsConfig.forEach(p => {
+            const matched = liveVouchersCache.filter(p.filter).filter(v => v.status !== 'expired' && v.usage_progress < 100);
+            
+            let voucherDetailText = `Mã đặc quyền ${p.label}`;
+
+            if (matched.length > 0) {
+                const voucher = matched[0];
+                voucherDetailText = `🔥 <strong>${voucher.voucher_code}</strong> (${voucher.usage_progress}%) &rarr; ${voucher.description}`;
+            }
+
+            const nodeHTML = `
+                <div class="voucher-node-card">
+                    <a class="btn-go ${p.btnClass}" href="${p.link}" target="_blank">
+                        <span class="step-badge-mini">B1</span>Áp mã ${p.label}
+                    </a>
+                    <div style="font-size: 11px; color: #475569; margin-top: 6px; line-height: 1.4; text-align:center;">${voucherDetailText}</div>
+                </div>
+            `;
+            zone.insertAdjacentHTML('beforeend', nodeHTML);
+        });
+    }
+
+    function checkAndShowFbNotice() {
+        var ua = navigator.userAgent || "";
+        if (/FBAN\/|FBAV\//i.test(ua)) {
+            document.getElementById("fb-browser-notice").classList.remove("hidden");
+        }
+    }
+
+    /* ĐÃ SỬA LỖI URL UNDEFINED: Gán trực tiếp link Step2 cho trường link của LocalStorage để gọi chính xác */
+    function saveToHistoryLocalStorage(shopeeUrl, productName, splitResult) {
+        try {
+            let currentHistory = JSON.parse(localStorage.getItem('shopee_convert_history')) || [];
+            const d = new Date();
+            const timeStr = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')} ${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+
+            const historyItem = {
+                url: shopeeUrl,
+                title: productName,
+                time: timeStr,
+                link: splitResult.step2 || "" 
+            };
+
+            currentHistory = currentHistory.filter(item => item.url !== shopeeUrl);
+            currentHistory.unshift(historyItem);
+            if(currentHistory.length > 15) currentHistory.pop();
+
+            localStorage.setItem('shopee_convert_history', JSON.stringify(currentHistory));
+        } catch (err) { console.error("Lỗi lưu lịch sử:", err); }
+    }
+
+    /* ĐÃ ĐỒNG BỘ ĐỌC BIẾN ITEM.LINK TRÁNH BỊ LỖI PHÁT SINH UNDEFINED */
+    function renderHistoryList() {
+        const targetContainer = document.getElementById('historyContainerTarget');
+        const dataHistory = JSON.parse(localStorage.getItem('shopee_convert_history')) || [];
+
+        if (dataHistory.length === 0) {
+            targetContainer.innerHTML = '<p style="text-align:center; color:#64748b; font-size:13px; padding:20px 10px;">Chưa có lịch sử chuyển đổi liên kết nào.</p>';
+            return;
+        }
+
+        let fullHTML = '';
+        dataHistory.forEach(item => {
+            const finalRedirectUrl = item.link || "#";
+            fullHTML += `
+                <div class="hist-item-box">
+                    <div class="hist-prod-info">
+                        <div class="hist-img-placeholder">📦</div>
+                        <div style="min-width: 0; flex: 1;">
+                            <div class="hist-title-txt">${item.title}</div>
+                            <div class="hist-url-txt">${item.url}</div>
+                            <div class="hist-time-txt">⏱ Khởi tạo: ${item.time}</div>
+                        </div>
+                    </div>
+                    <a class="btn-history-go" href="${finalRedirectUrl}" target="_blank">Mua ngay</a>
+                </div>
+            `;
+        });
+
+        targetContainer.innerHTML = fullHTML;
+    }
+
+    function clearAllHistory() {
+        if(confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử chuyển đổi liên kết?")) {
+            localStorage.removeItem('shopee_convert_history');
+            renderHistoryList();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchLiveVouchers();
+        checkAndShowFbNotice();
+    });
+</script>
+</body>
+</html>
