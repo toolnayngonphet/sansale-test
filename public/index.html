@@ -408,19 +408,20 @@
         workflow.style.display = 'none';
 
         try {
-            const [infoResponse, splitResponse] = await Promise.all([
-                fetch('/api/product-info', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: url })
-                }).then(res => res.json()).catch(() => null),
+            // SỬA ĐỔI: Chạy API tuần tự thay vì Promise.all
+            // 1. Chờ gọi product-info để backend lấy và lưu cache link dài
+            const infoResponse = await fetch('/api/product-info', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: url })
+            }).then(res => res.json()).catch(() => null);
 
-                fetch('/api/split-link', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: url })
-                }).then(res => res.json())
-            ]);
+            // 2. Chờ xong API trên mới gọi split-link để backend đọc đúng cache
+            const splitResponse = await fetch('/api/split-link', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: url })
+            }).then(res => res.json());
 
             let pName = "Sản phẩm Shopee";
             if (infoResponse && infoResponse.success) {
