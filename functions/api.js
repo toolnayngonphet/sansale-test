@@ -124,7 +124,17 @@ router.post('/split-link', async (req, res) => {
             if (salesocResponse && salesocResponse.data && salesocResponse.data.success === true) {
                 const data = salesocResponse.data;
                 
-                const finalUrlForStep2 = resolvedLinksCache[url.trim()] || url;
+                // SỬA ĐỔI: Chỉ lấy link từ cache, gỡ bỏ `|| url`
+                const finalUrlForStep2 = resolvedLinksCache[url.trim()];
+
+                // NẾU KHÔNG CÓ LINK DÀI -> CHẶN VÀ BÁO LỖI
+                if (!finalUrlForStep2) {
+                    return res.json({
+                        success: false,
+                        message: "Tạm hết mã giảm giá hoặc website đang quá tải, vui lòng thử lại sau 5s"
+                    });
+                }
+
                 const step2AffiliateLink = `https://s.shopee.vn/an_redir?origin_link=${encodeURIComponent(finalUrlForStep2)}&affiliate_id=${MY_AFFILIATE_ID}`;
 
                 const hasYoutube = data.hasYoutubeVoucher !== false;
